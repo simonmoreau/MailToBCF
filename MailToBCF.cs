@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
+using BIM42.Models;
 
 namespace BIM42
 {
@@ -46,5 +47,6 @@ namespace BIM42
                 ? (ActionResult)new OkObjectResult($"Hello, {email.Subject}")
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
+
     }
 }

@@ -1,4 +1,4 @@
-namespace BIM42
+namespace BIM42.Models
 {
     /// <summary>
     /// A model with the data format of the Inbound Parse API's POST
