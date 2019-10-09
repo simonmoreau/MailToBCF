@@ -8,7 +8,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Text;
+using System.Text.RegularExpressions;
 using BIM42.Models;
 using BIM42.Models.BCF;
 
@@ -50,7 +50,11 @@ namespace BIM42
 
             Topic topic = new Topic(email.Subject);
             topic.description = email.Text;
-            topic.assigned_to = email.To;
+
+            Regex regex = new Regex(@"<.*?>", RegexOptions.IgnoreCase);
+            MatchCollection matches = regex.Matches(email.To);
+            string assigned_to = matches[0].Value.Replace("<","").Replace("","");
+            topic.assigned_to = assigned_to;
 
             HttpClient httpClient = new  HttpClient();
             BimsyncBCFClient bcfClient = new BimsyncBCFClient(httpClient);
