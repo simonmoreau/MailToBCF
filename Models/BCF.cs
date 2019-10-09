@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BIM42.Models.BCF
 {
@@ -36,18 +37,28 @@ namespace BIM42.Models.BCF
         public bool unlinked { get; set; }
     }
 
+    [JsonObject(MemberSerialization.OptIn)]
     public class Topic
     {
+        public Topic(string title)
+        {
+            this.title = title;
+        }
         public string guid { get; set; }
+        [JsonProperty]
         public string topic_type { get; set; }
+        [JsonProperty]
         public string topic_status { get; set; }
+        [JsonProperty]
         public string title { get; set; }
         public List<string> labels { get; set; }
         public DateTime creation_date { get; set; }
         public string creation_author { get; set; }
         public DateTime modified_date { get; set; }
         public string modified_author { get; set; }
+        [JsonProperty]
         public string assigned_to { get; set; }
+        [JsonProperty]
         public string description { get; set; }
         public int bimsync_issue_number { get; set; }
     }

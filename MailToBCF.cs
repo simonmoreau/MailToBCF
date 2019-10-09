@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -9,7 +10,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
 using BIM42.Models;
+using BIM42.Models.BCF;
 
+using BIM42.Services;
 namespace BIM42
 {
     public static class MailToBCF
@@ -22,6 +25,8 @@ namespace BIM42
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             IFormCollection formdata = await req.ReadFormAsync();
+            String body = await req.ReadAsStringAsync();
+            log.LogInformation($"The ReadAsStringAsync contains :{body}");
 
             log.LogInformation($"The subject is {formdata["subject"]}");
             log.LogInformation($"The sender is {formdata["from"]}");
@@ -42,6 +47,14 @@ namespace BIM42
                 Charsets = string.IsNullOrEmpty(formdata["charsets"]) ? "" : formdata["charsets"].ToString(),
                 Spf = string.IsNullOrEmpty(formdata["spf"]) ? "" : formdata["spf"].ToString(),
             };
+
+            Topic topic = new Topic(email.Subject);
+            topic.description = email.Text;
+            topic.assigned_to = email.To;
+
+            HttpClient httpClient = new  HttpClient();
+            BimsyncBCFClient bcfClient = new BimsyncBCFClient(httpClient);
+            await bcfClient.CreateTopicsAsync("12bd226d-2e3c-4bcd-8987-b900d232da89",topic);
 
             return email != null
                 ? (ActionResult)new OkObjectResult($"Hello, {email.Subject}")

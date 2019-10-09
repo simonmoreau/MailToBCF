@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -43,13 +44,20 @@ namespace BIM42.Services
             return topics;
         }
 
-        public async Task<Topic> CreateTopicsAsync(string project_id)
+        public async Task<Topic> CreateTopicsAsync(string project_id, Topic topic)
         {
             string path = String.Format("projects/{0}/topics", project_id);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, path);
+            string jsonTopic = JsonConvert.SerializeObject(topic,
+                            Newtonsoft.Json.Formatting.None,
+                            new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            });
+            request.Content = new StringContent(jsonTopic.ToString(), Encoding.UTF8, "application/json");
 
-            Topic topic = await SendRequest<Topic>(request, new CancellationToken());
-            return topic;
+            Topic newTopic = await SendRequest<Topic>(request, new CancellationToken());
+            return newTopic;
         }
 
         public async Task<List<Comment>> GetComments(string project_id, string topic_guid)
